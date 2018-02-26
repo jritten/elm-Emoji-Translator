@@ -5,6 +5,7 @@ import Model
 import Html
 import Html.Events
 import Html.Attributes
+import EmojiConverter
 
 
 view : Model.Model -> Html.Html Update.Msg
@@ -36,9 +37,33 @@ view model =
                     , Html.Events.onInput Update.SetCurrentText
                     ]
                     []
+                ]
+            , Html.div 
+                [ Html.Attributes.class "switch center"]
+                [ Html.label 
+                    []
+                    [ Html.text "Translate Text"
+                    , Html.input 
+                        [ Html.Attributes.type_ "checkbox"]
+                        []
+                    , Html.span
+                        [ Html.Attributes.class "lever"
+                        , Html.Events.onClick Update.ToggleDirection
+                        ]
+                        []
+                    , Html.text "Translate Emoji"
+                    ]
                 , Html.p 
                     [ Html.Attributes.class "center output-text emoji-size" ]
-                    [ Html.text model.currentText ]
+                    [ Html.text (translateText model) ]
                 ]
             ]
         ]
+
+translateText : Model.Model -> String
+translateText model = 
+    case model.direction of
+        Model.TextToEmoji -> 
+            EmojiConverter.textToEmoji Model.defaultKey model.currentText
+        Model.EmojiToText ->
+            EmojiConverter.emojiToText Model.defaultKey model.currentText
