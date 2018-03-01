@@ -44,26 +44,58 @@ view model =
                     []
                     [ Html.text "Translate Text"
                     , Html.input 
-                        [ Html.Attributes.type_ "checkbox"]
-                        []
-                    , Html.span
-                        [ Html.Attributes.class "lever"
+                        [ Html.Attributes.type_ "checkbox"
                         , Html.Events.onClick Update.ToggleDirection
                         ]
                         []
+                    , Html.span
+                        [ Html.Attributes.class "lever" ]
+                        []
                     , Html.text "Translate Emoji"
                     ]
+                ]
                 , Html.p 
                     [ Html.Attributes.class "center output-text emoji-size" ]
                     [ Html.text (translateText model) ]
                 ]
+            , Html.div
+                [ Html.Attributes.class "divider" ]
+                []
+            , Html.section
+                [ Html.Attributes.class "container" ]
+                [ Html.h4 
+                    [ Html.Attributes.class "center" ]
+                    [ Html.text "Select Your Key" ]
+                , (renderKeys model)
+                ]
             ]
-        ]
+
 
 translateText : Model.Model -> String
 translateText model = 
     case model.direction of
         Model.TextToEmoji -> 
-            EmojiConverter.textToEmoji Model.defaultKey model.currentText
+            EmojiConverter.textToEmoji model.selectedKey model.currentText
+
         Model.EmojiToText ->
-            EmojiConverter.emojiToText Model.defaultKey model.currentText
+            EmojiConverter.emojiToText model.selectedKey model.currentText
+
+renderKeys : Model.Model -> Html.Html Update.Msg
+renderKeys model = 
+    Html.div
+        [ Html.Attributes.class "row" ]
+        (List.map (\emoji -> renderKey model emoji) EmojiConverter.supportedEmojis)
+
+renderKey : Model.Model -> String -> Html.Html Update.Msg
+renderKey model emoji =
+    Html.div 
+        [ Html.Attributes.class "col s2 m1 emoji-size" ]
+        [ Html.div 
+            [Html.Attributes.classList 
+                [ ( "key-selector", True )
+                , ( "is-selected", emoji == model.selectedKey )
+                ]
+            , Html.Events.onClick (Update.SetSelectedKey emoji)
+            ]
+            [ Html.text emoji ]
+        ]
